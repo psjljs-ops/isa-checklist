@@ -104,7 +104,7 @@
 <div class="wrap">
   <!-- 대가성 문구: 이 페이지에 실린 제휴 종류에 맞춰 자동으로 채워집니다 (페이지 첫머리) -->
   <p class="disclosure" id="disclosure"></p>
-  <a class="back" href="index.html" id="backLink">‹ 이사 체크리스트로</a>
+  <a class="back" href="/" id="backLink">‹ 이사 체크리스트로</a>
   <div id="page"></div>
   <footer id="footer">업체 정보, 가격, 서비스 내용은 각 업체와 판매처의 안내를 따릅니다. 이 페이지는 정보를 모아 연결해 드릴 뿐 계약·판매 당사자가 아닙니다.</footer>
 </div>
@@ -113,7 +113,7 @@
 /* ==================================================================
    제휴 상품 설정 — 모든 제휴 링크는 여기서만 관리합니다.
 
-   주소: offers.html?c=카테고리   (예: offers.html?c=clean)
+   주소: /offers?c=카테고리   (예: /offers?c=clean)
 
    store 종류
      "albarich" / "tenping"  → 상담·견적 신청형 (파란 버튼 카드)
@@ -313,7 +313,7 @@ var key = params.get("c"), date = params.get("d");
 if (!(date && /^\d{4}-\d{2}-\d{2}$/.test(date))) date = null;
 var cat = CATEGORIES[key];
 var qs = date ? "&d=" + date : "";
-if (date) document.getElementById("backLink").href = "index.html?d=" + date;
+if (date) document.getElementById("backLink").href = "/?d=" + date;
 
 var VKEY = "offers-visited";
 var visited = {};
@@ -326,7 +326,7 @@ function moreLinks() {
   Object.keys(CATEGORIES).forEach(function (k) {
     if (k === key) return;
     var c = CATEGORIES[k];
-    h += '<a href="offers.html?c=' + k + qs + '"><span>' + c.icon + '</span>' + esc(c.menu) + '</a>';
+    h += '<a href="/offers?c=' + k + qs + '"><span>' + c.icon + '</span>' + esc(c.menu) + '</a>';
   });
   return '<section class="card"><h2>다른 이사 준비도 확인해 보세요</h2><div class="more">' + h + '</div></section>';
 }

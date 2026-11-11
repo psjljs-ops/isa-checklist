@@ -16,6 +16,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://isa-checklist.pages.dev/">
 <meta name="theme-color" content="#3182f6">
+<meta name="google-site-verification" content="mM9h9M-RD--eig_kQoxlpfIkTL-EmWw2WRh2go4-hyg">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
   /* 제휴 링크는 이 페이지에 없습니다. 모든 제휴 상품은 offers.html 에서 관리합니다. */
@@ -307,7 +308,7 @@ function ctaHtml(cta) {
   var html = cta.map(function (c) {
     var cls = c.shop ? "cta shop" : "cta lead-cta";
     var inner = c.shop ? esc(c.label) + " ›" : esc(c.label) + (c.note ? ' <small>· ' + esc(c.note) + '</small>' : "");
-    return '<a class="' + cls + '" href="offers.html?c=' + encodeURIComponent(c.page) + '&d=' + esc(state.date) + '">' + inner + '</a>';
+    return '<a class="' + cls + '" href="/offers?c=' + encodeURIComponent(c.page) + '&d=' + esc(state.date) + '">' + inner + '</a>';
   }).join("");
   return html ? '<div class="ctas">' + html + '</div>' : "";
 }
