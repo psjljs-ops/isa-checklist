@@ -155,6 +155,14 @@
     body { background: #fff; } .disclosure, .tools, .ctas, .chips, .hero svg, .faq, .toast { display: none !important; }
     .card, .phase { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
   }
+  /* 형제 사이트 연결 카드 */
+  .sib { display: grid; gap: 8px; }
+  .sib a { display: flex; align-items: center; gap: 12px; background: var(--soft); border-radius: 14px; padding: 13px 14px; text-decoration: none; color: var(--text); }
+  .sib a:hover { background: var(--line); }
+  .sib .ic { font-size: 22px; line-height: 1; flex: none; }
+  .sib b { display: block; font-size: 15px; font-weight: 700; }
+  .sib small { display: block; font-size: 13px; color: var(--sub); }
+  .sib .go { margin-left: auto; color: var(--muted); font-size: 18px; flex: none; }
 </style>
 </head>
 <body>
@@ -211,6 +219,15 @@
   </section>
 
   <div id="list"><div class="card empty"><b>이사 날짜를 골라 주세요</b>날짜별 체크리스트가 바로 만들어져요.</div></div>
+
+  <section class="card">
+    <h2>함께 보면 좋은 체크리스트</h2>
+    <div class="sib">
+      <a href="https://wedding-dday.pages.dev/"><span class="ic" aria-hidden="true">💍</span><span><b>결혼 준비 D-day</b><small>예식일까지 상견례부터 혼인신고까지</small></span><span class="go" aria-hidden="true">›</span></a>
+      <a href="https://yakjeong.pages.dev/"><span class="ic" aria-hidden="true">📶</span><span><b>인터넷 약정 계산기</b><small>약정 만료일과 예상 위약금 계산</small></span><span class="go" aria-hidden="true">›</span></a>
+      <a href="https://chulsan-checklist.pages.dev/"><span class="ic" aria-hidden="true">🍼</span><span><b>출산 준비 체크리스트</b><small>예정일로 주차별 할 일·출산 가방</small></span><span class="go" aria-hidden="true">›</span></a>
+    </div>
+  </section>
 
   <section class="card faq">
     <h2>자주 묻는 질문</h2>
