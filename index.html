@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>이사 체크리스트 생성기</title>
+<meta name="description" content="이사 날짜만 넣으면 D-30부터 이사 후까지 할 일을 날짜별로 정리해 드립니다. 이사업체 견적, 입주청소, 인터넷 이전, 전입신고까지 한 번에 체크하세요.">
+<meta property="og:title" content="이사 체크리스트 생성기 | D-30부터 전입신고까지">
+<meta property="og:description" content="이사 날짜만 넣으면 할 일이 날짜별로 정리됩니다.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://isa-checklist.pages.dev/">
+<meta property="og:image" content="https://isa-checklist.pages.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://isa-checklist.pages.dev/">
+<meta name="theme-color" content="#3182f6">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  /* 제휴 링크는 이 페이지에 없습니다. 모든 제휴 상품은 offers.html 에서 관리합니다. */
+  :root {
+    --bg: #f2f4f6; --card: #ffffff; --text: #191f28; --sub: #4e5968; --muted: #8b95a1;
+    --line: #e5e8eb; --soft: #f9fafb;
+    --blue: #3182f6; --blue-press: #1b64da; --blue-soft: #e8f3ff; --blue-text: #1b64da;
+    --green: #00b37e; --green-soft: #e5f8f1; --red: #f04452; --red-soft: #fff0f1;
+    --shadow: 0 2px 12px rgba(0, 27, 55, .06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #101013; --card: #1c1c21; --text: #f2f3f5; --sub: #c3c8cf; --muted: #8b95a1;
+      --line: #2c2c34; --soft: #24242b;
+      --blue: #4d94ff; --blue-press: #3182f6; --blue-soft: #1a2a45; --blue-text: #8bb8ff;
+      --green: #2fd39a; --green-soft: #12302a; --red: #ff6b77; --red-soft: #3a1c20;
+      --shadow: none;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    line-height: 1.6; letter-spacing: -0.01em; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 0 16px 48px; }
+
+  /* 대가성 문구 */
+  .disclosure { font-size: 12px; color: var(--muted); padding: 12px 0 0; line-height: 1.5; }
+
+  /* 히어로 */
+  .hero { padding: 28px 4px 8px; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+  .eyebrow { display: inline-block; font-size: 13px; font-weight: 700; color: var(--blue-text);
+    background: var(--blue-soft); padding: 4px 10px; border-radius: 99px; margin-bottom: 12px; }
+  h1 { font-size: clamp(26px, 7vw, 34px); line-height: 1.3; margin: 0 0 10px; font-weight: 800; letter-spacing: -0.03em; }
+  h1 em { font-style: normal; color: var(--blue); }
+  .lead { color: var(--sub); margin: 0; font-size: 16px; }
+  .hero svg { flex: none; width: 116px; height: auto; }
+  @media (max-width: 420px) { .hero svg { width: 84px; } }
+
+  /* 카드 */
+  .card { background: var(--card); border-radius: 22px; padding: 22px; margin-top: 16px; box-shadow: var(--shadow); }
+  .label { font-size: 14px; font-weight: 700; color: var(--sub); margin-bottom: 10px; display: block; }
+  .date-input { width: 100%; font: inherit; font-size: 18px; font-weight: 700; color: var(--text);
+    background: var(--soft); border: 2px solid transparent; border-radius: 14px; padding: 14px 16px; outline: none;
+    transition: border-color .15s, background .15s; }
+  .date-input:focus { border-color: var(--blue); background: var(--card); }
+  .chips { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 16px; }
+  .chip { position: relative; }
+  .chip.wide { grid-column: 1 / -1; }
+  .chip input { position: absolute; opacity: 0; pointer-events: none; }
+  .chip span { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-radius: 14px;
+    background: var(--soft); color: var(--sub); font-size: 15px; font-weight: 600; cursor: pointer;
+    border: 2px solid transparent; transition: all .15s; }
+  .chip span::before { content: ""; width: 18px; height: 18px; border-radius: 6px; border: 2px solid var(--line);
+    background: var(--card); flex: none; transition: all .15s; }
+  .chip input:checked + span { background: var(--blue-soft); color: var(--blue-text); border-color: var(--blue); }
+  .chip input:checked + span::before { background: var(--blue) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/12px no-repeat; border-color: var(--blue); }
+  .chip input:focus-visible + span { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+  /* D-day 요약 */
+  .summary { display: flex; align-items: center; gap: 20px; }
+  .ring { position: relative; width: 96px; height: 96px; flex: none; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring circle { fill: none; stroke-width: 9; }
+  .ring .track { stroke: var(--soft); }
+  .ring .fill { stroke: var(--blue); stroke-linecap: round; transition: stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1); }
+  .ring .pct { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 800; font-size: 20px; }
+  .ring .pct small { font-size: 12px; font-weight: 700; }
+  .dday { font-size: clamp(30px, 9vw, 40px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.15; }
+  .dday-sub { color: var(--muted); font-size: 15px; font-weight: 500; margin-top: 4px; }
+  .tools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 20px; }
+  .tool { font: inherit; font-size: 14px; font-weight: 600; color: var(--sub); background: var(--soft);
+    border: 0; border-radius: 12px; padding: 12px 6px; cursor: pointer; transition: background .15s; }
+  .tool:hover { background: var(--line); }
+  .tool:active { transform: scale(.97); }
+
+  /* 타임라인 */
+  .phase { margin-top: 16px; background: var(--card); border-radius: 22px; padding: 22px 22px 8px; box-shadow: var(--shadow); }
+  .phase-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .phase-head h2 { font-size: 19px; font-weight: 800; margin: 0; letter-spacing: -0.03em; }
+  .phase-head .count { font-size: 13px; font-weight: 700; color: var(--muted); }
+  .phase.complete .count { color: var(--green); background: var(--green-soft); padding: 3px 10px; border-radius: 99px; }
+  .task { position: relative; display: flex; gap: 14px; padding: 0 0 18px; }
+  .task:not(:last-child)::after { content: ""; position: absolute; left: 13px; top: 32px; bottom: 4px; width: 2px; background: var(--line); }
+  .check { appearance: none; -webkit-appearance: none; margin: 2px 0 0; width: 28px; height: 28px; flex: none;
+    border-radius: 50%; border: 2px solid var(--line); background: var(--card); cursor: pointer; position: relative; z-index: 1;
+    transition: background .2s, border-color .2s; }
+  .check:hover { border-color: var(--blue); }
+  .check:checked { background: var(--blue) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/16px no-repeat; border-color: var(--blue); animation: pop .35s cubic-bezier(.2,1.6,.4,1); }
+  .check:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  @keyframes pop { 0% { transform: scale(.7); } 100% { transform: scale(1); } }
+  .body { flex: 1; min-width: 0; }
+  .meta { font-size: 13px; font-weight: 600; color: var(--muted); }
+  .meta .late { color: var(--red); background: var(--red-soft); font-weight: 700; padding: 1px 8px; border-radius: 99px; margin-left: 6px; display: none; }
+  .task.late:not(.done) .meta .late { display: inline; }
+  .t { font-size: 16px; font-weight: 700; margin-top: 1px; transition: color .2s; }
+  .d { color: var(--sub); font-size: 14px; margin-top: 2px; }
+  .task.done .t { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+  .task.done .d, .task.done .ctas { display: none; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .cta { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-size: 15px; font-weight: 700;
+    border-radius: 12px; padding: 12px 16px; transition: background .15s, transform .1s; }
+  .cta:active { transform: scale(.97); }
+  .cta.lead-cta { background: var(--blue); color: #fff; width: 100%; justify-content: center; }
+  .cta.lead-cta:hover { background: var(--blue-press); }
+  .cta.lead-cta small { font-weight: 600; opacity: .85; font-size: 13px; }
+  .cta.shop { width: 100%; justify-content: center; background: var(--blue-soft); color: var(--blue-text);
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--blue) 35%, transparent); }
+  .cta.shop::before { content: ""; width: 18px; height: 18px; flex: none; background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='20' r='1.5'/%3E%3Ccircle cx='18' cy='20' r='1.5'/%3E%3Cpath d='M2 3h3l2.7 12.4a2 2 0 0 0 2 1.6h8.6a2 2 0 0 0 2-1.6L22 7H6'/%3E%3C/svg%3E") center/contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='20' r='1.5'/%3E%3Ccircle cx='18' cy='20' r='1.5'/%3E%3Cpath d='M2 3h3l2.7 12.4a2 2 0 0 0 2 1.6h8.6a2 2 0 0 0 2-1.6L22 7H6'/%3E%3C/svg%3E") center/contain no-repeat; }
+  .cta.shop:hover { background: color-mix(in srgb, var(--blue) 18%, var(--card)); }
+  .empty { text-align: center; color: var(--muted); padding: 36px 16px; }
+  .empty b { display: block; color: var(--text); font-size: 17px; margin-bottom: 4px; }
+
+  /* FAQ */
+  .faq h2 { font-size: 19px; font-weight: 800; margin: 0 0 6px; letter-spacing: -0.03em; }
+  .faq details { border-top: 1px solid var(--line); }
+  .faq details:first-of-type { border-top: 0; }
+  .faq summary { list-style: none; cursor: pointer; font-weight: 700; padding: 16px 28px 16px 0; position: relative; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: ""; position: absolute; right: 4px; top: 50%; width: 8px; height: 8px; margin-top: -6px;
+    border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform .2s; }
+  .faq details[open] summary::after { transform: rotate(-135deg); margin-top: -2px; }
+  .faq details p { margin: 0 0 16px; color: var(--sub); font-size: 15px; }
+  footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 28px; }
+
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); background: #191f28; color: #fff;
+    padding: 12px 18px; border-radius: 14px; font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none;
+    transition: all .25s; max-width: calc(100% - 32px); }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  @media print {
+    body { background: #fff; } .disclosure, .tools, .ctas, .chips, .hero svg, .faq, .toast { display: none !important; }
+    .card, .phase { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow">무료 · 회원가입 없음</span>
+      <h1>이사 날짜만 넣으면<br><em>할 일이 정리돼요</em></h1>
+      <p class="lead">한 달 전 견적부터 전입신고까지, 놓치기 쉬운 할 일을 날짜별로 챙겨 드려요.</p>
+    </div>
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <rect x="22" y="20" width="34" height="30" rx="5" fill="#ffd27a"/>
+      <rect x="22" y="31" width="34" height="5" fill="#f2b84b"/>
+      <rect x="54" y="8" width="28" height="24" rx="5" fill="#ffc35a"/>
+      <rect x="54" y="17" width="28" height="4" fill="#eaa53a"/>
+      <rect x="10" y="48" width="64" height="40" rx="8" fill="#3182f6"/>
+      <path d="M74 58h20c3 0 5 1 7 3l10 13c1 2 2 3 2 5v5c0 2-2 4-4 4H74z" fill="#1b64da"/>
+      <path d="M80 62h12l8 11H80z" fill="#cfe3ff"/>
+      <rect x="18" y="58" width="22" height="5" rx="2.5" fill="#fff" opacity=".85"/>
+      <circle cx="30" cy="92" r="11" fill="#191f28"/><circle cx="30" cy="92" r="4.5" fill="#e5e8eb"/>
+      <circle cx="94" cy="92" r="11" fill="#191f28"/><circle cx="94" cy="92" r="4.5" fill="#e5e8eb"/>
+    </svg>
+  </header>
+
+  <section class="card">
+    <label class="label" for="moveDate">언제 이사하세요?</label>
+    <input class="date-input" type="date" id="moveDate">
+    <div class="chips" id="opts">
+      <label class="chip"><input type="checkbox" data-flag="rent"><span>전·월세예요</span></label>
+      <label class="chip"><input type="checkbox" data-flag="kids"><span>아이가 있어요</span></label>
+      <label class="chip"><input type="checkbox" data-flag="aircon"><span>에어컨 옮겨요</span></label>
+      <label class="chip"><input type="checkbox" data-flag="car"><span>차가 있어요</span></label>
+      <label class="chip wide"><input type="checkbox" data-flag="interior"><span>인테리어·도배 고민 중이에요</span></label>
+    </div>
+  </section>
+
+  <section class="card" id="summaryCard" hidden>
+    <div class="summary">
+      <div class="ring">
+        <svg viewBox="0 0 100 100"><circle class="track" cx="50" cy="50" r="42"/><circle class="fill" id="ringFill" cx="50" cy="50" r="42"/></svg>
+        <div class="pct"><div id="pct">0<small>%</small></div></div>
+      </div>
+      <div>
+        <div class="dday" id="dday"></div>
+        <div class="dday-sub" id="dateText"></div>
+      </div>
+    </div>
+    <div class="tools">
+      <button type="button" class="tool" id="shareBtn">공유하기</button>
+      <button type="button" class="tool" id="printBtn">PDF 저장</button>
+      <button type="button" class="tool" id="resetBtn">초기화</button>
+    </div>
+  </section>
+
+  <div id="list"><div class="card empty"><b>이사 날짜를 골라 주세요</b>날짜별 체크리스트가 바로 만들어져요.</div></div>
+
+  <section class="card faq">
+    <h2>자주 묻는 질문</h2>
+    <details><summary>이사업체 견적은 언제 받아야 하나요?</summary>
+      <p>보통 한 달 전에 받는 게 좋습니다. 월말·주말·성수기(봄 이사철)는 빨리 마감되므로 날짜가 정해지면 바로 2~3곳 견적을 비교하세요.</p></details>
+    <details><summary>전입신고는 언제까지 해야 하나요?</summary>
+      <p>새 거주지로 이사한 날부터 14일 이내에 해야 합니다. 정부24에서 온라인으로 하거나 주민센터를 방문하면 됩니다. 전·월세라면 확정일자도 함께 받아 두세요.</p></details>
+    <details><summary>입주청소는 이사 전에 해야 하나요?</summary>
+      <p>짐이 들어오기 전 빈집 상태에서 하는 게 가장 깨끗합니다. 잔금일과 이사일 사이에 하루 여유가 있으면 그날로 예약하는 경우가 많습니다.</p></details>
+    <details><summary>인터넷 이전 설치는 얼마나 미리 신청하나요?</summary>
+      <p>설치 기사 일정 때문에 최소 1~2주 전에는 신청하는 게 안전합니다. 약정이 끝났다면 이전 대신 신규 가입 혜택을 비교해 보는 것도 방법입니다.</p></details>
+  </section>
+
+  <footer>본 체크리스트는 일반적인 이사 절차를 정리한 참고 자료입니다. 행정 절차와 기한은 관할 기관 안내를 우선해 주세요.<br>일부 연결 페이지에는 제휴 링크가 포함되어 있으며, 이를 통해 운영자가 수수료를 받을 수 있습니다.</footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* 할 일 목록. offset = 이사일 기준 며칠 전(-)/후(+), flag = 옵션 선택 시에만 표시 */
+var TASKS = [
+  { id:"quote",   offset:-30, t:"이사업체 견적 2~3곳 비교", d:"날짜가 정해지면 바로. 주말·월말·봄철은 빨리 마감돼요.",
+    cta:[{page:"moving", label:"포장이사 무료 견적 비교하기", note:"업체 3곳"}] },
+  { id:"clean",   offset:-30, t:"입주청소 예약", d:"짐 들어오기 전 빈집 상태가 가장 깨끗해요.",
+    cta:[{page:"clean", label:"입주청소 견적 비교하기", note:"무료 상담"}] },
+  { id:"interior-quote", offset:-30, t:"인테리어·부분 시공 견적 받기", d:"도배·장판·욕실 공사는 이사 전 빈집일 때 해야 해요. 업체 일정이 2~3주씩 밀리니 가장 먼저 견적을 비교하세요.", flag:"interior",
+    cta:[{page:"interior", label:"인테리어 무료 견적 받기", note:"무료 상담"}] },
+  { id:"net",     offset:-21, t:"인터넷·TV 이전 또는 신규 가입", d:"설치 기사 일정 때문에 2~3주 전이 안전해요. 약정이 끝났다면 신규 혜택도 비교해 보세요.",
+    cta:[{page:"internet", label:"인터넷 가입 혜택 비교", note:"무료 상담"}] },
+  { id:"trash",   offset:-21, t:"버릴 짐 정리, 대형폐기물 신고", d:"구청 홈페이지나 앱에서 신고하고 스티커를 붙여 배출해요." },
+  { id:"lease",   offset:-21, t:"잔금 날짜·시간 확인", d:"집주인, 부동산과 잔금 시간과 이사 시간을 맞춰 두세요.", flag:"rent" },
+  { id:"aircon",  offset:-14, t:"에어컨 이전 설치 예약", d:"여름 전후로는 예약이 밀리니 서두르세요.", flag:"aircon" },
+  { id:"school",  offset:-14, t:"전학·어린이집 서류 확인", d:"전입신고 후 진행되는 절차가 많으니 필요한 서류를 미리 챙겨 두세요.", flag:"kids" },
+  { id:"box",     offset:-14, t:"박스·테이프·뽁뽁이 준비", d:"포장이사라도 귀중품용 작은 박스는 따로 준비하세요.",
+    cta:[{page:"box", label:"이사 박스·포장재", shop:true}] },
+  { id:"gas",     offset:-14, t:"도시가스 전출·전입 예약", d:"지역 도시가스사에 연락해 철거·설치 날짜를 잡아요." },
+  { id:"mail",    offset:-10, t:"우편물 주소 이전 신청", d:"우체국 주거이전 서비스로 옛 주소 우편물을 새 주소로 받을 수 있어요." },
+  { id:"water",   offset:-7,  t:"새집 정수기·가전 렌탈 알아보기", d:"설치 날짜를 이사 직후로 맞추면 편해요.",
+    cta:[{page:"rental", label:"정수기 렌탈 비교하기", note:"무료 상담"}] },
+  { id:"measure", offset:-7,  t:"새집 수납공간 치수 재기", d:"옷장, 신발장, 싱크대 아래 치수를 재 두면 정리용품을 한 번에 살 수 있어요.",
+    cta:[{page:"storage", label:"수납·정리용품", shop:true}] },
+  { id:"elev",    offset:-7,  t:"엘리베이터·주차 사용 예약", d:"양쪽 집 관리사무소에 이사 날짜를 알리고 예약해요." },
+  { id:"fridge1", offset:-3,  t:"냉장고 음식 비우기 시작", d:"남은 식재료 위주로 식단을 짜 두세요." },
+  { id:"bills",   offset:-3,  t:"관리비·공과금 정산 요청", d:"이사 당일 검침 기준으로 정산할 수 있게 관리사무소에 알려 두세요." },
+  { id:"survival",offset:-1,  t:"이사 당일 생존 박스 싸기", d:"휴지, 물티슈, 충전기, 상비약, 장갑, 칼, 쓰레기봉투를 한 상자에.",
+    cta:[{page:"survival", label:"이사 당일 필수템", shop:true}] },
+  { id:"fridge2", offset:-1,  t:"냉장고·세탁기 물 빼기", d:"전날 밤에 해 두면 당일 물이 새지 않아요." },
+  { id:"valuable",offset:-1,  t:"귀중품·서류 따로 챙기기", d:"계약서, 통장, 귀금속은 직접 들고 이동하세요." },
+  { id:"meter",   offset:0,   t:"전기·가스·수도 계량기 사진 찍기", d:"나가는 집과 들어가는 집 모두 찍어 두면 정산 분쟁을 막을 수 있어요." },
+  { id:"photo",   offset:0,   t:"새집 하자 사진 기록", d:"짐 넣기 전에 벽지, 바닥, 창틀 상태를 찍어 두세요." },
+  { id:"check",   offset:0,   t:"짐 파손·누락 확인 후 잔금", d:"업체에 잔금을 주기 전에 큰 가구와 가전을 먼저 확인하세요." },
+  { id:"move-in", offset:3,   t:"전입신고 (14일 이내)", d:"정부24 온라인 또는 주민센터. 기한을 넘기면 과태료가 나올 수 있어요." },
+  { id:"fixdate", offset:3,   t:"확정일자 받기", d:"전입신고와 함께 받아 두면 보증금 보호에 도움이 돼요.", flag:"rent" },
+  { id:"carAddr", offset:7,   t:"자동차·면허 주소 확인", d:"전입신고 시 자동 변경되는 항목이 많지만, 보험사 주소는 직접 바꿔야 할 수 있어요.", flag:"car" },
+  { id:"newhome", offset:7,   t:"새집 생활용품 채우기", d:"욕실, 주방 소모품부터 채워요.",
+    cta:[{page:"newhome", label:"새집 필수템", shop:true}] },
+  { id:"interior",offset:14,  t:"조명·커튼·소품으로 마무리", d:"급하지 않은 인테리어 소품은 천천히 저렴하게.",
+    cta:[{page:"decor", label:"조명·인테리어 소품", shop:true}] }
+];
+
+var PHASES = [
+  { max:-22, name:"한 달 전" }, { max:-11, name:"2~3주 전" }, { max:-4, name:"1주 전" },
+  { max:-1, name:"이사 직전" }, { max:0, name:"이사 당일" }, { max:999, name:"이사 후" }
+];
+
+/* ---------------- 저장 (실패해도 동작) ---------------- */
+var KEY = "moving-checklist-v1";
+function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+var state = load();
+state.done = state.done || {};
+state.flags = state.flags || {};
+(function () {
+  var p = new URLSearchParams(location.search);
+  if (p.get("d")) state.date = p.get("d");
+  if (p.get("o")) p.get("o").split(",").forEach(function (f) { state.flags[f] = true; });
+})();
+
+/* ---------------- 도우미 ---------------- */
+var WD = ["일","월","화","수","목","금","토"];
+function parse(s) { var a = s.split("-"); return new Date(+a[0], +a[1]-1, +a[2]); }
+function addDays(d, n) { var x = new Date(d); x.setDate(x.getDate()+n); return x; }
+function today() { var t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); }
+function fmt(d) { return (d.getMonth()+1) + "월 " + d.getDate() + "일 (" + WD[d.getDay()] + ")"; }
+function diff(a, b) { return Math.round((a - b) / 86400000); }
+function offLabel(o) { return o === 0 ? "D-day" : (o < 0 ? "D" + o : "D+" + o); }
+function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+var $ = function (id) { return document.getElementById(id); };
+var toastTimer;
+function toast(msg) { var t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2200); }
+
+function visibleTasks() { return TASKS.filter(function (t) { return !t.flag || state.flags[t.flag]; }); }
+
+function ctaHtml(cta) {
+  if (!cta) return "";
+  /* 모든 버튼은 내 사이트의 추천 모음 페이지(offers.html)로 이동합니다 */
+  var html = cta.map(function (c) {
+    var cls = c.shop ? "cta shop" : "cta lead-cta";
+    var inner = c.shop ? esc(c.label) + " ›" : esc(c.label) + (c.note ? ' <small>· ' + esc(c.note) + '</small>' : "");
+    return '<a class="' + cls + '" href="offers.html?c=' + encodeURIComponent(c.page) + '&d=' + esc(state.date) + '">' + inner + '</a>';
+  }).join("");
+  return html ? '<div class="ctas">' + html + '</div>' : "";
+}
+
+/* ---------------- 그리기 ---------------- */
+var CIRC = 2 * Math.PI * 42;
+$("ringFill").style.strokeDasharray = CIRC;
+$("ringFill").style.strokeDashoffset = CIRC;
+
+function render() {
+  if (!state.date) return;
+  var move = parse(state.date), now = today(), tasks = visibleTasks();
+  var left = diff(move, now);
+  $("dday").textContent = left > 0 ? "D-" + left : (left === 0 ? "D-day" : "D+" + (-left));
+  $("dateText").textContent = fmt(move) + " 이사" + (left === 0 ? " · 오늘이에요!" : "");
+  $("summaryCard").hidden = false;
+
+  var html = "", start = -9999;
+  PHASES.forEach(function (ph, i) {
+    var items = tasks.filter(function (t) { return t.offset > start && t.offset <= ph.max; });
+    start = ph.max;
+    if (!items.length) return;
+    html += '<section class="phase" data-phase="' + i + '"><div class="phase-head"><h2>' + ph.name + '</h2><span class="count"></span></div>';
+    items.forEach(function (t) {
+      var due = addDays(move, t.offset), done = !!state.done[t.id], late = diff(due, now) < 0;
+      html += '<div class="task' + (done ? ' done' : '') + (late ? ' late' : '') + '" data-task="' + t.id + '">' +
+        '<input type="checkbox" class="check" data-id="' + t.id + '"' + (done ? ' checked' : '') + ' aria-label="' + esc(t.t) + '">' +
+        '<div class="body"><div class="meta">' + offLabel(t.offset) + ' · ' + fmt(due) + '<span class="late">놓쳤어요</span></div>' +
+        '<div class="t">' + esc(t.t) + '</div><div class="d">' + esc(t.d) + '</div>' + ctaHtml(t.cta) + '</div></div>';
+    });
+    html += '</section>';
+  });
+  $("list").innerHTML = html;
+  progress();
+}
+
+function progress() {
+  var tasks = visibleTasks();
+  var n = tasks.filter(function (t) { return state.done[t.id]; }).length;
+  var p = tasks.length ? Math.round(n / tasks.length * 100) : 0;
+  $("pct").innerHTML = p + "<small>%</small>";
+  $("ringFill").style.strokeDashoffset = CIRC * (1 - p / 100);
+  document.querySelectorAll(".phase").forEach(function (sec) {
+    var boxes = sec.querySelectorAll(".check"), c = 0;
+    boxes.forEach(function (b) { if (b.checked) c++; });
+    var complete = c === boxes.length;
+    sec.classList.toggle("complete", complete);
+    sec.querySelector(".count").textContent = complete ? "완료 ✓" : c + " / " + boxes.length;
+  });
+}
+
+/* ---------------- 이벤트 ---------------- */
+$("moveDate").addEventListener("change", function (e) { state.date = e.target.value; save(); render(); });
+document.querySelectorAll("#opts input").forEach(function (el) {
+  el.checked = !!state.flags[el.dataset.flag];
+  el.addEventListener("change", function () { state.flags[el.dataset.flag] = el.checked; save(); render(); });
+});
+$("list").addEventListener("change", function (e) {
+  var id = e.target.dataset.id; if (!id) return;
+  state.done[id] = e.target.checked; save();
+  e.target.closest(".task").classList.toggle("done", e.target.checked);
+  progress();
+  var sec = e.target.closest(".phase");
+  if (e.target.checked && sec.classList.contains("complete")) toast(sec.querySelector("h2").textContent + " 할 일을 모두 끝냈어요 🎉");
+});
+$("printBtn").onclick = function () { window.print(); };
+$("resetBtn").onclick = function () { if (confirm("체크 표시를 모두 지울까요?")) { state.done = {}; save(); render(); toast("초기화했어요"); } };
+$("shareBtn").onclick = function () {
+  var flags = Object.keys(state.flags).filter(function (k) { return state.flags[k]; });
+  var url = location.origin + location.pathname + "?d=" + state.date + (flags.length ? "&o=" + flags.join(",") : "");
+  if (navigator.share) { navigator.share({ title: document.title, url: url }).catch(function () {}); }
+  else if (navigator.clipboard) { navigator.clipboard.writeText(url).then(function () { toast("링크를 복사했어요"); }, function () { prompt("이 링크를 복사하세요", url); }); }
+  else { prompt("이 링크를 복사하세요", url); }
+};
+
+if (state.date) $("moveDate").value = state.date;
+render();
+</script>
+</body>
+</html>
